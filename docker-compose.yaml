@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  mysql-docker-container:
+    hostname: my-sql-host
+    container_name: mysql-docker-container
+    image: mysql/mysql-server:5.7
+    environment:
+      - MYSQL_DATABASE=postdb
+      - MYSQL_ROOT_PASSWORD=admin
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=admin
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - /data/mysql
+    ports:
+    - "3307:3306"
+    restart: always
+
+  spring-boot-microblog:
+    hostname: spring-boot-microblog
+    container_name: spring-boot-microblog
+    image: spring-boot-microblog
+    build:
+      context: ./
+      dockerfile: docker/microblog/Dockerfile
+    depends_on:
+    - mysql-docker-container
+    ports:
+    - 8081:8080
+    volumes:
+    - /data/spring-boot-microblog
